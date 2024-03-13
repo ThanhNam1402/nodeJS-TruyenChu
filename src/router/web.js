@@ -5,9 +5,16 @@ import homeController from "../controllers/homeController";
 import userController from "../controllers/userController";
 import createrController from "../controllers/createrController";
 
+
+import { checkTokenJWT } from "../middelware/jwt";
+
 let router = express.Router();
 
 let initWebRouters = (app) => {
+
+
+    router.all('*',)
+
     // router.get('/', homeController.getHomePage);
     // router.get('/about', homeController.getAboutPage);
     // router.get('/add-user', homeController.creteCRUD);
@@ -19,7 +26,7 @@ let initWebRouters = (app) => {
 
     // client 
     router.post('/api/login', userController.handelLogin);
-    router.get('/api/getAllUser', userController.handelGetAllUser);
+    router.get('/api/users', checkTokenJWT, userController.handelGetAllUser);
     router.post('/api/createUser', userController.handelCreateUser);
     router.delete('/api/delUser', userController.handelDelUser);
     router.put('/api/editUser', userController.handelEditUser);
@@ -32,8 +39,6 @@ let initWebRouters = (app) => {
     router.get('/api/creater/getBooks', createrController.createrGetBooks);
     router.get('/api/creater/getAllCode', createrController.handelGetAllCode);
     router.delete('/api/creater/delBook', createrController.createrDelBook);
-
-    // chua xong 
     router.put('/api/creater/editBook', createrController.createrEditBook);
 
     // fix post - > put 
@@ -45,9 +50,8 @@ let initWebRouters = (app) => {
     router.get('/api/creater/getBookById', createrController.handelGetBookByID);
     router.delete('/api/creater/delDraft', createrController.handelDelDraft);
 
-
+    // chapters
     router.get('/api/creater/getChapterByBookID', createrController.createrGetChapterByBookID);
-
     router.put('/api/creater/editChapter', createrController.createrEditChapter);
 
 

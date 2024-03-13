@@ -1,7 +1,12 @@
 
-
-
 import db from '../models/index';
+// $2a$10$SAgLhuAvrRl68uGsnBgQROh7KRICSBd2DW7G606RFRzvW.GFb429O
+// eve.holt@reqres.in
+
+
+
+import { createTokenJWT } from "../middelware/jwt";
+
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 
@@ -19,47 +24,51 @@ let hashPass = (pass) => {
     })
 }
 
-let handelLogin = (email, password) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let userData = {};
-            let isExist = await checkUserEmail(email);
-            if (isExist) {
+let handelLogin = async (email, password) => {
 
-                let user = await db.Users.findOne({
-                    where: { email: email },
-                    attributes: ['email', 'password', 'roleId'],
-                    raw: true
-                })
+    try {
+        let userData = {};
 
-                if (user) {
-                    let check = await bcrypt.compareSync(password, user.password);
+        // check mail not null 
+        let isExist = await checkUserEmail(email);
 
-                    if (check) {
-                        userData.errorCode = 0;
-                        userData.message = 'susses'
-                        delete user.password;
-                        userData.user = user
-                    } else {
-                        userData.errorCode = 3;
-                        userData.message = 'error password'
-                    }
+        if (isExist) {
+            let user = await db.Users.findOne({
+                where: { email: email },
+                attributes: ['email', 'name', 'password', 'roleId'],
+                raw: true
+            })
+
+            if (user) {
+                let check = bcrypt.compareSync(password, user.password);
+
+                if (check) {
+
+                    userData.EC = 0;
+                    userData.EM = 'success'
+                    delete user.password;
+                    userData.token = createTokenJWT(user)
+
+                } else {
+                    userData.EC = 1;
+                    userData.EM = 'error password'
                 }
-
-
-            } else {
-                userData.errorCode = 2;
-                userData.message = 'Email not found .Plz try orther email';
             }
 
-            resolve(userData);
-
-
-        } catch (error) {
-            reject(error);
+        } else {
+            userData.EC = 2;
+            userData.EM = 'Không tìm thấy Email !! Vui lòng thử lại !';
         }
 
-    });
+
+        console.log(userData);
+        return userData
+
+
+    } catch (error) {
+        console.log(error);
+    }
+
 
 }
 
@@ -129,8 +138,7 @@ let createUser = (data) => {
                 await db.Users.create({
                     email: data.email,
                     password: hashPassword,
-                    firstName: data.firstName,
-                    lastName: data.lastName,
+                    name: data.name,
                     adress: data.adress,
                     phoneNumber: data.phoneNumber,
                     gender: data.gender === "1" ? true : false,
@@ -150,7 +158,7 @@ let createUser = (data) => {
 
 }
 
-let getAllUSer = () => {
+let getAllUser = () => {
     return new Promise(async (resolve, reject) => {
         try {
             let users = await db.Users.findAll({
@@ -163,8 +171,6 @@ let getAllUSer = () => {
         } catch (error) {
             reject(error);
         }
-
-
     })
 }
 
@@ -242,7 +248,7 @@ let editUser = (data) => {
 
 module.exports = {
     handelLogin: handelLogin,
-    getAllUSer: getAllUSer,
+    getAllUser: getAllUser,
     createUser: createUser,
     delUser: delUser,
     editUser: editUser,

@@ -2,21 +2,20 @@
 
 import jwt from "jsonwebtoken";
 
-const createTokenJWT = () => {
+const createTokenJWT = (payload) => {
 
-    let payload = { name: 'namcute', email: 'namcute12@gmail.com' }
-    let key = process.env.JWT_SECRET
+    let key = process.env.JWT_TOKEN_SECRET
 
     const jwtToken = jwt.sign(payload, key);
 
-    console.log(jwtToken)
+    console.log("jwtToken : ", jwtToken)
 
     return jwtToken
 }
 
 
-const verify = (token) => {
-    let key = process.env.JWT_SECRET
+const verifyTokenJWT = (token) => {
+    let key = process.env.JWT_TOKEN_SECRET
 
     let data = null
 
@@ -26,24 +25,41 @@ const verify = (token) => {
 
     } catch (err) {
         console.log(err)
-
     }
 
     return data
-
-
-
-
-
-
 }
 
 
-// var privateKey = fs.readFileSync('private.key');
-// var token = jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' });
+const checkTokenJWT = (req, res, next) => {
+    let userCookie = req.cookies
+
+    if (userCookie && userCookie.accessToken) {
+        let token = userCookie.accessToken
+
+        let decoded = verifyTokenJWT(token)
+
+        if (!decoded) {
+            return res.status(401).json({
+                EC: 1,
+                EM: 'invalid token'
+            })
+        }
+
+        next()
+
+    } else {
+        return res.status(401).json({
+            EC: 1,
+            EM: 'token null'
+        })
+    }
+}
+
 
 
 module.exports = {
     createTokenJWT: createTokenJWT,
-    verify: verify
+    verifyTokenJWT: verifyTokenJWT,
+    checkTokenJWT: checkTokenJWT
 }

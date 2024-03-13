@@ -4,28 +4,35 @@ import serviceUser from '../services/serveiceUser';
 
 
 let handelLogin = async (req, res) => {
+
     let email = req.body.email;
     let password = req.body.password;
 
     if (!email || !password) {
-        return res.status(500).json({
-            errorCode: 1,
-            message: 'Erorr Email or Password'
+        return res.status(200).json({
+            EC: 1,
+            EM: 'Erorr Email or Password'
         })
     }
-    let userData = await serviceUser.handelLogin(email, password)
-    return res.status(200).json({
-        errorCode: userData.errorCode,
-        message: userData.message,
-        user: userData.user ?? {}
-    });
 
+    let userData = await serviceUser.handelLogin(email, password)
+
+    // set cookie token 
+    res.cookie('accessToken', userData.token, { httpOnly: true })
+
+    console.log('userData:', userData);
+    return res.status(200).json({
+        EC: userData.EC,
+        EM: userData.EM,
+        data: userData.token ?? {}
+    });
 
 }
 
 
 let handelGetAllUser = async (req, res) => {
-    let users = await serviceUser.getAllUSer();
+
+    let users = await serviceUser.getAllUser();
     console.log(users)
 
     return res.status(200).json({
@@ -35,7 +42,7 @@ let handelGetAllUser = async (req, res) => {
     })
 }
 
- 
+
 let handelCreateUser = async (req, res) => {
     let data = req.body
     let message = await serviceUser.createUser(data)
@@ -58,7 +65,6 @@ let handelDelUser = async (req, res) => {
         data: message
     })
 }
-
 
 let handelEditUser = async (req, res) => {
     let data = req.body
@@ -87,8 +93,6 @@ let handelgetAllCode = async (req, res) => {
         })
     }
 }
-
-
 
 
 module.exports = {
