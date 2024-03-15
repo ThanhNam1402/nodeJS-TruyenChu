@@ -1,7 +1,5 @@
 import express from "express";
 
-
-import homeController from "../controllers/homeController";
 import userController from "../controllers/userController";
 import createrController from "../controllers/createrController";
 
@@ -12,24 +10,13 @@ let router = express.Router();
 
 let initWebRouters = (app) => {
 
-
-    router.all('*',)
-
-    // router.get('/', homeController.getHomePage);
-    // router.get('/about', homeController.getAboutPage);
-    // router.get('/add-user', homeController.creteCRUD);
-    // router.post('/post-crud', homeController.postCRUD);
-    // router.get('/all-user', homeController.getCRUD);
-    // router.get('/edit-user', homeController.editCRUD);
-    // router.post('/handel', homeController.handelCRUD);
-    // router.post('/del-crud', homeController.delCRUD);
-
-    // client 
+    // users 
     router.post('/api/login', userController.handelLogin);
     router.get('/api/users', checkTokenJWT, userController.handelGetAllUser);
     router.post('/api/createUser', userController.handelCreateUser);
     router.delete('/api/delUser', userController.handelDelUser);
     router.put('/api/editUser', userController.handelEditUser);
+    router.get('/api/user/:id', userController.handelGetUserByID);
     router.get('/api/getAllCode', userController.handelgetAllCode);
 
     // book

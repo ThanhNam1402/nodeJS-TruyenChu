@@ -29,40 +29,56 @@ let handelLogin = async (req, res) => {
 
 }
 
-
 let handelGetAllUser = async (req, res) => {
 
     let users = await serviceUser.getAllUser();
     console.log(users)
 
     return res.status(200).json({
-        errorCode: 0,
-        mess: 'Oke',
-        users: users
+        EC: 0,
+        EM: 'Oke',
+        data: users
     })
 }
-
 
 let handelCreateUser = async (req, res) => {
     let data = req.body
     let message = await serviceUser.createUser(data)
     return res.status(200).json({
-        data: message
+        EC: message.EC,
+        EM: message.EM
     })
 
 }
 
+let handelGetUserByID = async (req, res) => {
+    try {
+
+        let data = await serviceUser.getUserByID(req.params.id);
+        return res.status(200).json({
+            user: data.data,
+            EC: data.EC,
+            EM: data.EM
+        })
+
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 let handelDelUser = async (req, res) => {
-    let id = req.body.id
+    let id = req.query.id
     if (!id) {
         return res.status(200).json({
-            message: 'User already exists',
-            errorCode: 1
+            EM: 'User already exists',
+            EC: 1
         })
     }
     let message = await serviceUser.delUser(id)
     return res.status(200).json({
-        data: message
+        EC: message.EC,
+        EM: message.EM
     })
 }
 
@@ -70,7 +86,8 @@ let handelEditUser = async (req, res) => {
     let data = req.body
     let message = await serviceUser.editUser(data)
     return res.status(200).json({
-        data: message
+        EC : message.EC,
+        EM : message.EM,
     })
 
 }
@@ -101,5 +118,6 @@ module.exports = {
     handelCreateUser: handelCreateUser,
     handelDelUser: handelDelUser,
     handelEditUser: handelEditUser,
-    handelgetAllCode: handelgetAllCode
+    handelgetAllCode: handelgetAllCode,
+    handelGetUserByID: handelGetUserByID
 }

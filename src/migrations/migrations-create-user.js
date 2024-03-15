@@ -17,9 +17,6 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      adress: {
-        type: Sequelize.STRING
-      },
       gender: {
         type: Sequelize.BOOLEAN
       },
@@ -30,10 +27,6 @@ module.exports = {
         type: Sequelize.STRING
       },
       phoneNumber: {
-        type: Sequelize.STRING
-      },
-      positionId: {
-        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {

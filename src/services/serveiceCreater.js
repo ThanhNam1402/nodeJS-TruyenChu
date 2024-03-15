@@ -429,7 +429,6 @@ let getDraftByID = (id) => {
     })
 }
 
-
 // CHAPTER
 
 let getChapterByBookID = (id) => {

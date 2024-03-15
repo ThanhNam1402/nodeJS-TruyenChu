@@ -4,7 +4,6 @@ import db from '../models/index';
 // eve.holt@reqres.in
 
 
-
 import { createTokenJWT } from "../middelware/jwt";
 
 const bcrypt = require('bcryptjs');
@@ -72,7 +71,6 @@ let handelLogin = async (email, password) => {
 
 }
 
-
 let checkUserEmail = (UserEmail) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -92,7 +90,6 @@ let checkUserEmail = (UserEmail) => {
 
     });
 }
-
 
 let getAllCode = (type) => {
     return new Promise(async (resolve, reject) => {
@@ -121,7 +118,6 @@ let getAllCode = (type) => {
     })
 }
 
-
 let createUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -129,8 +125,8 @@ let createUser = (data) => {
             let check = await checkUserEmail(data.email);
             if (check === true) {
                 resolve({
-                    errorCode: 1,
-                    message: 'Email already exists'
+                    EC: 1,
+                    EM: 'Email Đã Tồn Tại !!'
                 });
             }
             else {
@@ -139,14 +135,13 @@ let createUser = (data) => {
                     email: data.email,
                     password: hashPassword,
                     name: data.name,
-                    adress: data.adress,
                     phoneNumber: data.phoneNumber,
-                    gender: data.gender === "1" ? true : false,
-                    roleId: data.roleId,
+                    gender: data.gender,
+                    roleId: data.roleID,
                 })
                 resolve({
-                    errorCode: 0,
-                    message: 'create user success'
+                    EC: 0,
+                    EM: 'Tạo Người Dùng Thành Công'
                 });
             }
 
@@ -174,7 +169,6 @@ let getAllUser = () => {
     })
 }
 
-
 let delUser = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -186,14 +180,14 @@ let delUser = (id) => {
 
             if (!user) {
                 resolve({
-                    errorCode: 1,
-                    message: "User not found"
+                    EC: 1,
+                    EM: "Erro !! Không tìm thấy user"
                 })
             } else {
                 await user.destroy();
                 resolve({
-                    errorCode: 0,
-                    message: "User deleted success"
+                    EC: 0,
+                    EM: "Thao Tác Thành Công !"
                 })
             }
         } catch (error) {
@@ -212,8 +206,8 @@ let editUser = (data) => {
 
             if (!data.id) {
                 resolve({
-                    errorCode: 1,
-                    message: "user qrequired"
+                    EC: 1,
+                    EM: "Error !! Không tìm thấy user "
                 })
             }
             let user = await db.Users.findOne({
@@ -221,19 +215,21 @@ let editUser = (data) => {
                 raw: false
             })
             if (user) {
-                user.firstName = data.firstName;
-                user.lastName = data.lastName;
-                user.adress = data.adress;
+                user.name = data.name;
+                user.email = data.email;
+                user.roleId = data.roleID;
+                user.gender = data.gender;
+                user.phone = data.phone;
                 await user.save();
                 resolve({
-                    errorCode: 0,
-                    message: "user update success"
+                    EC: 0,
+                    EM: "Cập Nhật Thành Công !"
                 });
 
             } else {
                 resolve({
-                    errorCode: 3,
-                    message: "error orther"
+                    EC: 3,
+                    EM: "Error !! Lỗi Không Xác Định"
                 });
             }
 
@@ -245,6 +241,37 @@ let editUser = (data) => {
     })
 }
 
+let getUserByID = async (id) => {
+    try {
+
+        let res = {}
+
+        let user = await db.Users.findOne({
+            where: { id: id },
+            attributes: {
+                exclude: ['password']
+            },
+
+            raw: true
+        });
+
+        if (user) {
+            res.data = user;
+            res.EC = 0;
+            res.EM = 'success';
+
+        } else {
+            res.EC = 1;
+            res.EM = 'Error : Not Found User';
+        }
+        return res
+
+    } catch (error) {
+        throw error
+    }
+
+}
+
 
 module.exports = {
     handelLogin: handelLogin,
@@ -253,5 +280,6 @@ module.exports = {
     delUser: delUser,
     editUser: editUser,
     getAllCode: getAllCode,
+    getUserByID: getUserByID
 
 }

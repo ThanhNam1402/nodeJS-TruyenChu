@@ -51,7 +51,7 @@ const checkTokenJWT = (req, res, next) => {
     } else {
         return res.status(401).json({
             EC: 1,
-            EM: 'token null'
+            EM: 'Bạn Cần Đăng Nhập Để Thực Hiện Yêu Cầu Này !!'
         })
     }
 }
