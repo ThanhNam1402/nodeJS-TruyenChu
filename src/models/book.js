@@ -8,6 +8,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Book.hasMany(models.Draft, { foreignKey: 'bookID' });
     }
+
+    static associate(models) {
+      Book.belongsTo(models.Users);
+    }
+
   };
   Book.init({
     name: DataTypes.STRING,
@@ -15,10 +20,13 @@ module.exports = (sequelize, DataTypes) => {
     categoryID: DataTypes.INTEGER,
     userID: DataTypes.INTEGER,
     world: DataTypes.INTEGER,
+    status: DataTypes.INTEGER,
     character: DataTypes.INTEGER,
     poetry: DataTypes.INTEGER,
     school: DataTypes.INTEGER,
-    thumbnail: DataTypes.STRING
+    state: DataTypes.INTEGER,
+    thumbnail: DataTypes.STRING,
+    publishAt : DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Book',

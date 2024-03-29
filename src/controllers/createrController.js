@@ -1,7 +1,6 @@
 
-
-
 import serveiceCreater from '../services/serveiceCreater';
+
 
 // BOOK >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -153,7 +152,6 @@ let handelEditDraft = async (req, res) => {
     }
 }
 
-
 let handelGetDraftByID = async (req, res) => {
     try {
         let data = await serveiceCreater.getDraftByID(req.query.id);
@@ -216,7 +214,6 @@ let handelDelDraft = async (req, res) => {
     })
 }
 
-
 // CHAPTERS
 
 let createrGetChapterByBookID = async (req, res) => {
@@ -235,7 +232,6 @@ let createrGetChapterByBookID = async (req, res) => {
     }
 }
 
-
 let createrEditChapter = async (req, res) => {
     try {
         console.log('data', req.body);
@@ -249,7 +245,6 @@ let createrEditChapter = async (req, res) => {
         console.log(error)
     }
 }
-
 
 module.exports = {
     createrGetBooks: createrGetBooks,

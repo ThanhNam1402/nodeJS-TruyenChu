@@ -1,47 +1,20 @@
 import express from "express";
 
-import userController from "../controllers/userController";
-import createrController from "../controllers/createrController";
-
-
+import { routerAdmin } from "./routerAdmin";
+import { routerClient } from "./routerClient";
+import { routerCreater } from "./routerCreater";
 import { checkTokenJWT } from "../middelware/jwt";
 
 let router = express.Router();
 
+
+
 let initWebRouters = (app) => {
 
-    // users 
-    router.post('/api/login', userController.handelLogin);
-    router.get('/api/users', checkTokenJWT, userController.handelGetAllUser);
-    router.post('/api/createUser', userController.handelCreateUser);
-    router.delete('/api/delUser', userController.handelDelUser);
-    router.put('/api/editUser', userController.handelEditUser);
-    router.get('/api/user/:id', userController.handelGetUserByID);
-    router.get('/api/getAllCode', userController.handelgetAllCode);
+    router.all('*', checkTokenJWT)
 
-    // book
-    router.post('/api/creater/addBook', createrController.createrAddBook);
-    router.get('/api/creater/getCodeByType', createrController.createrGetCodeByType);
-    router.get('/api/creater/getCateGoRy', createrController.handelGetCateGoRy);
-    router.get('/api/creater/getBooks', createrController.createrGetBooks);
-    router.get('/api/creater/getAllCode', createrController.handelGetAllCode);
-    router.delete('/api/creater/delBook', createrController.createrDelBook);
-    router.put('/api/creater/editBook', createrController.createrEditBook);
-
-    // fix post - > put 
-    router.post('/api/creater/createDraft', createrController.handelcreateDraft);
-    router.post('/api/creater/editDraft', createrController.handelEditDraft);
-    router.post('/api/creater/editDraftByID', createrController.handelEditDraftByID);
-    router.get('/api/creater/getDrafts', createrController.handelGetDrafts);
-    router.get('/api/creater/getDraftById', createrController.handelGetDraftByID);
-    router.get('/api/creater/getBookById', createrController.handelGetBookByID);
-    router.delete('/api/creater/delDraft', createrController.handelDelDraft);
-
-    // chapters
-    router.get('/api/creater/getChapterByBookID', createrController.createrGetChapterByBookID);
-    router.put('/api/creater/editChapter', createrController.createrEditChapter);
-
-
+    app.use('/admin', routerAdmin)
+    app.use('/', routerClient, routerCreater);
     return app.use("/", router);
 }
 

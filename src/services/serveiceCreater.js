@@ -73,6 +73,7 @@ let editBook = async (data) => {
                 book.character = data.bookChar,
                 book.school = data.bookSchool,
                 book.world = data.bookWorld,
+                book.state = data.bookState,
 
                 await book.save();
 
@@ -243,7 +244,7 @@ let getDrafts = () => {
                 include: [
                     {
                         model: db.Book,
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name'] 
                     },
                 ],
                 attributes: ['id', 'content', 'createdAt', 'draftName'],

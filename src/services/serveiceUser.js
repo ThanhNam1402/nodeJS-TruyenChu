@@ -4,7 +4,7 @@ import db from '../models/index';
 // eve.holt@reqres.in
 
 
-import { createTokenJWT } from "../middelware/jwt";
+import { createTokenJWT, verifyTokenJWT } from "../middelware/jwt";
 
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
@@ -27,14 +27,12 @@ let handelLogin = async (email, password) => {
 
     try {
         let userData = {};
-
-        // check mail not null 
         let isExist = await checkUserEmail(email);
 
         if (isExist) {
             let user = await db.Users.findOne({
                 where: { email: email },
-                attributes: ['email', 'name', 'password', 'roleId'],
+                attributes: ['email', 'name', 'password', 'roleId', 'id'],
                 raw: true
             })
 
@@ -59,16 +57,35 @@ let handelLogin = async (email, password) => {
             userData.EM = 'Không tìm thấy Email !! Vui lòng thử lại !';
         }
 
-
         console.log(userData);
         return userData
-
 
     } catch (error) {
         console.log(error);
     }
 
 
+}
+
+const getAccount = async (token) => {
+    try {
+        let res = {}
+        let verifyUser = verifyTokenJWT(token)
+
+        let account = await db.Users.findOne({
+            where: { id: verifyUser.id },
+            attributes: {
+                exclude: ['password']
+            },
+            raw: true
+        })
+        res.data = account;
+        res.EC = 0;
+        res.EM = 'success';
+
+        return res
+
+    } catch (error) { throw error }
 }
 
 let checkUserEmail = (UserEmail) => {
@@ -220,6 +237,7 @@ let editUser = (data) => {
                 user.roleId = data.roleID;
                 user.gender = data.gender;
                 user.phone = data.phone;
+
                 await user.save();
                 resolve({
                     EC: 0,
@@ -280,6 +298,7 @@ module.exports = {
     delUser: delUser,
     editUser: editUser,
     getAllCode: getAllCode,
-    getUserByID: getUserByID
+    getUserByID: getUserByID,
+    getAccount: getAccount
 
 }

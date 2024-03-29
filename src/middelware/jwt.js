@@ -13,7 +13,6 @@ const createTokenJWT = (payload) => {
     return jwtToken
 }
 
-
 const verifyTokenJWT = (token) => {
     let key = process.env.JWT_TOKEN_SECRET
 
@@ -23,15 +22,17 @@ const verifyTokenJWT = (token) => {
         let decoded = jwt.verify(token, key);
         data = decoded
 
+        console.log(data);
+
     } catch (err) {
-        console.log(err)
+        console.log(err);
     }
 
     return data
 }
 
-
 const checkTokenJWT = (req, res, next) => {
+
     let userCookie = req.cookies
 
     if (userCookie && userCookie.accessToken) {
@@ -51,7 +52,7 @@ const checkTokenJWT = (req, res, next) => {
     } else {
         return res.status(401).json({
             EC: 1,
-            EM: 'Bạn Cần Đăng Nhập Để Thực Hiện Yêu Cầu Này !!'
+            EM: 'new Bạn Cần Đăng Nhập Để Thực Hiện Yêu Cầu Này !!'
         })
     }
 }

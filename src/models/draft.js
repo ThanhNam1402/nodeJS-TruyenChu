@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
 
     static associate(models) {
       Draft.belongsTo(models.Book);
-
     }
   };
   Draft.init({
