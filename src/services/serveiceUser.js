@@ -1,30 +1,14 @@
 
 import db from '../models/index';
-// $2a$10$SAgLhuAvrRl68uGsnBgQROh7KRICSBd2DW7G606RFRzvW.GFb429O
-// eve.holt@reqres.in
-
-
-import { createTokenJWT, verifyTokenJWT } from "../middelware/jwt";
 
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 
+import { createTokenJWT, verifyTokenJWT, createRefreshTokenJWT } from "../middelware/jwt";
 
-let hashPass = (pass) => {
-    return new Promise(async (resolve, reject) => {
 
-        try {
-            let hash = await bcrypt.hashSync(pass, salt);
-            resolve(hash);
-        } catch (error) {
-            reject(error);
-
-        }
-    })
-}
 
 let handelLogin = async (email, password) => {
-
     try {
         let userData = {};
         let isExist = await checkUserEmail(email);
@@ -40,21 +24,22 @@ let handelLogin = async (email, password) => {
                 let check = bcrypt.compareSync(password, user.password);
 
                 if (check) {
+                    delete user.password;
 
                     userData.EC = 0;
                     userData.EM = 'success'
-                    delete user.password;
                     userData.token = createTokenJWT(user)
+                    userData.refresh_token = createRefreshTokenJWT(user)
 
                 } else {
                     userData.EC = 1;
-                    userData.EM = 'error password'
+                    userData.EM = 'Error !! Nhập Sai Trường Password'
                 }
             }
 
         } else {
             userData.EC = 2;
-            userData.EM = 'Không tìm thấy Email !! Vui lòng thử lại !';
+            userData.EM = 'Error !! Không tìm thấy Email Vui lòng thử lại !';
         }
 
         console.log(userData);
@@ -67,9 +52,44 @@ let handelLogin = async (email, password) => {
 
 }
 
+let handelCheckRefreshToken = async (refreshToken) => {
+
+    try {
+        let userData = {};
+        let res = verifyTokenJWT(refreshToken);
+
+        console.log("res", res);
+
+        if (res) {
+            let user = await db.Users.findOne({
+                where: { id: res.id },
+                attributes: ['id', 'name'],
+                raw: true
+            })
+
+            userData.EC = 0;
+            userData.EM = 'success'
+            userData.token = createTokenJWT(user)
+            userData.refresh_token = createRefreshTokenJWT(user)
+        } else {
+            userData.EC = 1;
+            userData.EM = 'check user That bai'
+        }
+
+        console.log(userData);
+        return userData
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+ 
+
 const getAccount = async (token) => {
     try {
         let res = {}
+
+        console.log("token", token);
         let verifyUser = verifyTokenJWT(token)
 
         let account = await db.Users.findOne({
@@ -82,7 +102,6 @@ const getAccount = async (token) => {
         res.data = account;
         res.EC = 0;
         res.EM = 'success';
-
         return res
 
     } catch (error) { throw error }
@@ -108,33 +127,7 @@ let checkUserEmail = (UserEmail) => {
     });
 }
 
-let getAllCode = (type) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let res = {}
-
-            if (!type) {
-                res.errorCode = 1;
-                res.message = 'not found parameter';
-            } else {
-                let Allcode = await db.Allcode.findAll({
-                    where: { type: type },
-                    raw: true
-                });
-                res.data = Allcode;
-                res.errorCode = 0;
-                res.message = 'success';
-            }
-
-            resolve(res);
-
-        } catch (error) {
-
-            reject(error);
-        }
-    })
-}
-
+// create new user 
 let createUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -170,20 +163,76 @@ let createUser = (data) => {
 
 }
 
-let getAllUser = () => {
+// hass password
+let hashPass = (pass) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let users = await db.Users.findAll({
-                attributes: {
-                    exclude: ['password']
-                },
-            })
-
-            resolve(users);
+            let hash = bcrypt.hashSync(pass, salt);
+            resolve(hash);
         } catch (error) {
             reject(error);
         }
     })
+}
+
+let getAllCode = (type) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let res = {}
+
+            if (!type) {
+                res.errorCode = 1;
+                res.message = 'not found parameter';
+            } else {
+                let Allcode = await db.Allcode.findAll({
+                    where: { type: type },
+                    raw: true
+                });
+                res.data = Allcode;
+                res.errorCode = 0;
+                res.message = 'success';
+            }
+
+            resolve(res);
+
+        } catch (error) {
+
+            reject(error);
+        }
+    })
+}
+
+let getAllUser = async (reqData) => {
+
+    try {
+        let res = {}
+        let { count, rows } = await db.Users.findAndCountAll({
+            attributes: {
+                exclude: ['password']
+            },
+            limit: Number(reqData.limit),
+            offset: (Number(reqData.page) - 1) * Number(reqData.limit),
+            order: [['id', 'DESC']],
+            raw: true,
+        });
+
+        let pagination = {
+            total: count,
+            limit: Number(reqData.limit),
+            page: Number(reqData.page),
+        }
+
+        res.pagination = pagination
+        res.data = rows;
+        res.EC = 0;
+        res.EM = 'success';
+
+        return res
+
+    } catch (error) {
+        console.log(error);
+    }
+
 }
 
 let delUser = (id) => {
@@ -290,15 +339,17 @@ let getUserByID = async (id) => {
 
 }
 
-
 module.exports = {
-    handelLogin: handelLogin,
+
     getAllUser: getAllUser,
     createUser: createUser,
     delUser: delUser,
     editUser: editUser,
     getAllCode: getAllCode,
     getUserByID: getUserByID,
+    handelCheckRefreshToken: handelCheckRefreshToken,
+    handelLogin: handelLogin,
     getAccount: getAccount
+
 
 }

@@ -1,17 +1,22 @@
 
 
 import db from '../models/index';
-
+import Sequelize from 'sequelize';
 
 // BOOKS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
 
-let getBooks = async () => {
-    let res = {}
+
+
+let getBooks = async (creatorID) => {
 
     try {
+        let res = {}
 
         let allBook = await db.Book.findAll({
             attributes: ['id', 'name', 'createdAt', 'status'],
+            where: {
+                userID: creatorID
+            },
             order: [['id', 'DESC']],
             raw: true,
         });
@@ -23,10 +28,7 @@ let getBooks = async () => {
         return res
 
     } catch (error) {
-        res.data = [];
-        res.EC = 1;
-        res.EM = error.message;
-        return res
+        throw error;
     }
 
 }
@@ -38,6 +40,7 @@ let createBook = async (data) => {
         await db.Book.create({
             name: data.name,
             content: data.content,
+            userID : data.creatorID,
             categoryID: data.categoryID,
             world: data.bookWorld,
             character: data.bookChar,
@@ -122,9 +125,7 @@ let delBook = async (id) => {
 let getBookByID = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-
             let res = {}
-
             let book = await db.Book.findOne({
                 where: { id: id },
                 raw: true
@@ -233,7 +234,7 @@ let getCateGoRy = () => {
 
 // DRAFTS
 
-let getDrafts = () => {
+let getDrafts = (creatorID) => {
     return new Promise(async (resolve, reject) => {
         try {
 
@@ -241,28 +242,34 @@ let getDrafts = () => {
 
             let allDraft = await db.Draft.findAll({
 
+                where: {
+                    status: 0,
+                    userID: creatorID
+                },
+
+                attributes: [
+                    "id",
+                    "content",
+                    "createdAt",
+                    "draftName",
+                    [Sequelize.literal('`Book`.`name`'), 'bookName'],
+                ],
+
                 include: [
                     {
                         model: db.Book,
-                        attributes: ['id', 'name'] 
+                        attributes: []
                     },
                 ],
-                attributes: ['id', 'content', 'createdAt', 'draftName'],
-                where: { status: 0 },
+
+
                 order: [['id', 'DESC']],
                 raw: true
             });
 
-            if (allDraft) {
-                res.data = allDraft;
-                res.errorCode = 0;
-                res.message = 'success';
-
-            } else {
-                res.errorCode = 1;
-                res.message = 'Error';
-
-            }
+            res.data = allDraft;
+            res.EC = 0;
+            res.EM = 'success';
 
             return resolve(res);
 
@@ -278,20 +285,20 @@ let createDraft = (data) => {
             await db.Draft.create({
                 content: data.content,
                 draftName: data.draftName,
-                userID: 1,
+                userID: data.userID,
             })
 
             let newDraftID = await db.Draft.findAll({
                 attributes: ['id'],
                 order: [['id', 'DESC']],
-                limit: 1
+                limit: 1,
             })
 
             console.log('newDraftID ', newDraftID[0].id)
 
             let newDraft = await db.Draft.findOne({
                 where: { id: newDraftID[0].id },
-                raw: false
+                raw: true
             })
             resolve(newDraft);
 

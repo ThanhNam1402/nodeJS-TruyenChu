@@ -4,24 +4,39 @@ import db from '../models/index';
 // eve.holt@reqres.in
 
 
-let getAllTopics = () => {
-    return new Promise(async (resolve, reject) => {
-        
-        try {
-            let users = await db.Topic.findAll({
-                attributes: {
-                    exclude: ['content', 'userID']
-                },
-                order: [
-                    ['id', 'DESC'],
-                ],
-            })
+let getAllTopics = async (reqData) => {
+    console.log(reqData);
+    try {
 
-            resolve(users);
-        } catch (error) {
-            reject(error);
+        let res = {}
+        let { count, rows } = await db.Topic.findAndCountAll({
+            attributes: {
+                exclude: ['content', 'userID']
+            },
+            limit: Number(reqData.limit),
+            offset: (Number(reqData.page) - 1) * Number(reqData.limit),
+            order: [['id', 'DESC']],
+            raw: true,
+        });
+
+        let pagination = {
+            total: count,
+            limit: Number(reqData.limit),
+            page: Number(reqData.page),
         }
-    })
+
+        res.pagination = pagination
+        res.data = rows;
+        res.EC = 0;
+        res.EM = 'success';
+
+        return res
+
+    } catch (error) {
+        console.log(error);
+    }
+
+
 }
 
 let createTopic = (data) => {

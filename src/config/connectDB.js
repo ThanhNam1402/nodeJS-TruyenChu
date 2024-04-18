@@ -4,10 +4,10 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize('reactpj', 'root', 'mysql', {
     host: 'localhost',
     dialect: 'mysql',
-    logging : false,
+    logging: false,
 });
 
-let connectDB = async() => {
+let connectDB = async () => {
 
     try {
         await sequelize.authenticate();

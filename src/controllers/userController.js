@@ -2,10 +2,9 @@
 
 import serviceUser from '../services/serveiceUser';
 
-
+// login 
 let handelLogin = async (req, res) => {
     try {
-
         let email = req.body.email;
         let password = req.body.password;
         // ko nhập email or password
@@ -18,31 +17,29 @@ let handelLogin = async (req, res) => {
 
         let userData = await serviceUser.handelLogin(email, password)
 
-        console.log('userData:', userData);
-
+        // set cookie token 
         if (userData && userData.EC === 0) {
-            // set cookie token 
-            res.cookie('accessToken', userData.token)
-            // { httpOnly: true }
+            res.cookie('accessToken', userData.token, { httpOnly: true })
         }
-
-        console.log('userData:', userData);
         return res.status(200).json({
             EC: userData.EC,
             EM: userData.EM,
-            data: userData.token ?? null
+            data: {
+                token: userData.token ?? null,
+                refresh_token: userData.refresh_token ?? null
+            }
         });
     } catch (error) {
         return res.status(401).json({
-            EM: 'error',
+            EM: error.message,
             EC: 1
         })
 
     }
 }
+// logout
 let handelLogout = async (req, res) => {
     try {
-
         res.clearCookie('accessToken');
         return res.status(200).json({
             EC: 0,
@@ -50,31 +47,48 @@ let handelLogout = async (req, res) => {
         });
     } catch (error) {
         return res.status(401).json({
-            EM: 'error',
+            EM: error.message,
             EC: 1
         })
 
     }
 }
+// refresh token 
+const handelRefreshToken = async (req, res) => {
+    console.log("req.query", req.query);
 
-let handelGetAllUser = async (req, res) => {
+    let rfToken = req.query.token
 
-    let users = await serviceUser.getAllUser();
-    console.log(users)
+    console.log(rfToken);
+
+    let data = await serviceUser.handelCheckRefreshToken(rfToken)
+
+    console.log('data', data);
+
+    if (data && data.EC === 0) {
+        // set cookie token 
+        res.cookie('accessToken', data.token)
+
+        console.log(data.token);
+        // { httpOnly: true }
+    }
 
     return res.status(200).json({
-        EC: 0,
-        EM: 'Oke',
-        data: users
+        EC: data.EC,
+        EM: data.EM,
+        data: {
+            token: data.token ?? null,
+            refresh_token: data.refresh_token
+        }
     })
 }
+
+// get account user 
 let handelgetAccount = async (req, res) => {
-
     try {
+        console.log("req.body", req.body);
 
-        console.log("req.body", req.body.tokenUser);
-
-        let data = await serviceUser.getAccount(req.body.tokenUser);
+        let data = await serviceUser.getAccount(req.body.token);
         console.log(data)
 
         return res.status(200).json({
@@ -91,6 +105,23 @@ let handelgetAccount = async (req, res) => {
 
     }
 }
+
+
+let handelGetAllUser = async (req, res) => {
+
+    console.log(req.query);
+    let users = await serviceUser.getAllUser(req.query);
+
+    console.log(users)
+
+    return res.status(200).json({
+        data: users.data,
+        _pagination: users.pagination,
+        EC: users.EC,
+        EM: users.EM
+    })
+}
+
 
 let handelCreateUser = async (req, res) => {
     let data = req.body
@@ -164,7 +195,6 @@ let handelgetAllCode = async (req, res) => {
 
 
 module.exports = {
-    handelLogin: handelLogin,
     handelGetAllUser: handelGetAllUser,
     handelCreateUser: handelCreateUser,
     handelDelUser: handelDelUser,
@@ -172,5 +202,8 @@ module.exports = {
     handelgetAllCode: handelgetAllCode,
     handelGetUserByID: handelGetUserByID,
     handelgetAccount: handelgetAccount,
-    handelLogout : handelLogout
+    handelRefreshToken: handelRefreshToken,
+    handelLogin: handelLogin,
+    handelLogout: handelLogout
+
 }

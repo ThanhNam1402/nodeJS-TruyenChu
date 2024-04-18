@@ -12,7 +12,7 @@ let router = express.Router();
 
 // users 
 router.get('/api/users', checkTokenJWT, userController.handelGetAllUser);
-router.post('/api/createUser', checkTokenJWT, userController.handelCreateUser);
+router.post('/api/createUser', userController.handelCreateUser);
 router.delete('/api/delUser', userController.handelDelUser);
 router.put('/api/editUser', userController.handelEditUser);
 router.get('/api/user/:id', userController.handelGetUserByID);

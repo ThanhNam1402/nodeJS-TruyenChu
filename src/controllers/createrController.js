@@ -6,15 +6,17 @@ import serveiceCreater from '../services/serveiceCreater';
 
 const createrGetBooks = async (req, res) => {
     try {
-        let data = await serveiceCreater.getBooks();
+        let id = req.query.creatorID;
+        let data = await serveiceCreater.getBooks(id);
         return res.status(200).json({
-            data: data.data,
-            EC: data.EC,
-            EM: data.EM
+            ...data
         })
 
     } catch (error) {
-        console.log(error)
+        return res.status(403).json({
+            EC: 1,
+            message: error.message
+        })
     }
 }
 
@@ -109,33 +111,48 @@ let handelGetCateGoRy = async (req, res) => {
 
 // DRAFT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-let handelcreateDraft = async (req, res) => {
-    let data = req.body
-    console.log(data);
-    let message = await serveiceCreater.createDraft(data)
-    return res.status(200).json({
-        data: message,
-        EC: 0,
-        EM: 'success'
-    })
-
-}
 
 let handelGetDrafts = async (req, res) => {
     try {
-        let data = await serveiceCreater.getDrafts();
-        console.log('data', data);
+
+        let id = req.query.creatorID
+
+        let data = await serveiceCreater.getDrafts(id);
         return res.status(200).json({
-            data: data.data,
-            EC: data.errorCode,
-            EM: data.message
+            ...data
         })
 
 
     } catch (error) {
-        console.log(error)
+        return res.status(403).json({
+            EC: 1,
+            message: error.message
+        })
+
     }
 }
+
+let handelcreateDraft = async (req, res) => {
+    try {
+        let reqBody = req.body
+        console.log(data);
+        let data = await serveiceCreater.createDraft(reqBody)
+        return res.status(200).json({
+            data: data,
+            EC: 0,
+            EM: 'success'
+        })
+    } catch (error) {
+        return res.status(403).json({
+            EC: 1,
+            message: error.message
+        })
+    }
+
+
+}
+
+
 
 let handelEditDraft = async (req, res) => {
     try {

@@ -4,13 +4,14 @@ import serviceTopics from '../services/serviceTopics'
 
 let handelGetAllTopic = async (req, res) => {
 
-    let users = await serviceTopics.getAllTopics();
-    console.log(users)
+    let data = await serviceTopics.getAllTopics(req.query);
+    console.log(data)
 
     return res.status(200).json({
-        EC: 0,
-        EM: 'Oke',
-        data: users
+        data: data.data,
+        _pagination: data.pagination,
+        EC: data.EC,
+        EM: data.EM
     })
 }
 
@@ -100,5 +101,5 @@ module.exports = {
     handelDelTopic: handelDelTopic,
     handelGetTopicByID: handelGetTopicByID,
     handelEditTopic: handelEditTopic,
-    handelGetTopicBySlug : handelGetTopicBySlug
+    handelGetTopicBySlug: handelGetTopicBySlug
 }

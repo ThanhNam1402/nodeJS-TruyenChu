@@ -6,22 +6,30 @@ const createTokenJWT = (payload) => {
 
     let key = process.env.JWT_TOKEN_SECRET
 
-    const jwtToken = jwt.sign(payload, key);
+    const jwtToken = jwt.sign(payload, key, { expiresIn: '1h' });
 
     console.log("jwtToken : ", jwtToken)
 
     return jwtToken
 }
+const createRefreshTokenJWT = (payload) => {
 
-const verifyTokenJWT = (token) => {
     let key = process.env.JWT_TOKEN_SECRET
 
-    let data = null
+    const jwtToken = jwt.sign(payload, key, { expiresIn: '365d' });
 
+    console.log("jwtToken refresh: ", jwtToken)
+
+    return jwtToken
+}
+
+const verifyTokenJWT = (token) => {
+    console.log("verify token");
+    let key = process.env.JWT_TOKEN_SECRET
+    let data = null
     try {
         let decoded = jwt.verify(token, key);
         data = decoded
-
         console.log(data);
 
     } catch (err) {
@@ -46,9 +54,7 @@ const checkTokenJWT = (req, res, next) => {
                 EM: 'invalid token'
             })
         }
-
         next()
-
     } else {
         return res.status(401).json({
             EC: 1,
@@ -58,9 +64,9 @@ const checkTokenJWT = (req, res, next) => {
 }
 
 
-
 module.exports = {
     createTokenJWT: createTokenJWT,
     verifyTokenJWT: verifyTokenJWT,
-    checkTokenJWT: checkTokenJWT
+    checkTokenJWT: checkTokenJWT,
+    createRefreshTokenJWT: createRefreshTokenJWT,
 }
