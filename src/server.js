@@ -1,7 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 import viewEngine from "./config/viewEngine";
-import initWebRouters from "./router/web";
 import connectDB from "./config/connectDB"
 import cors from "cors";
 import cookieParser from "cookie-parser"
@@ -9,7 +8,7 @@ import 'dotenv/config'
 import { corsOptions } from "./config/cors";
 
 import { routerAdmin } from "./router/routerAdmin";
-import { routerCreater } from "./router/routerCreater";
+import { routerCreator } from "./router/routerCreator";
 import { routerClient } from "./router/routerClient";
 
 
@@ -26,7 +25,7 @@ viewEngine(app);
 
 
 app.use('/admin', routerAdmin)
-app.use('/', routerClient, routerCreater);
+app.use('/', routerClient, routerCreator);
 
 connectDB();
 

@@ -1,25 +1,24 @@
 
+import topicsService from '../services/topicsService'
 
-import serviceTopics from '../services/serviceTopics'
+let getAllTopics = async (req, res) => {
 
-let handelGetAllTopic = async (req, res) => {
+    try {
+        let data = await topicsService.getAllTopics(req.query);
 
-    let data = await serviceTopics.getAllTopics(req.query);
-    console.log(data)
+        return res.status(200).json({
+            ...data
+        })
+    } catch (error) {
 
-    return res.status(200).json({
-        data: data.data,
-        _pagination: data.pagination,
-        EC: data.EC,
-        EM: data.EM
-    })
+    }
+
 }
 
 let handelCreateTopic = async (req, res) => {
-
     try {
         let data = req.body
-        let message = await serviceTopics.createTopic(data)
+        let message = await topicsService.addTopic(data)
         return res.status(200).json({
             EC: message.EC,
             EM: message.EM
@@ -32,7 +31,7 @@ let handelCreateTopic = async (req, res) => {
 let handelGetTopicByID = async (req, res) => {
     try {
 
-        let data = await serviceTopics.getTopicByID(req.params.id);
+        let data = await topicsService.getTopicByID(req.params.id);
         return res.status(200).json({
             data: data.data,
             EC: data.EC,
@@ -48,7 +47,7 @@ let handelEditTopic = async (req, res) => {
 
     try {
         let data = req.body
-        let message = await serviceTopics.editTopic(data)
+        let message = await topicsService.editTopic(data)
         return res.status(200).json({
             EC: message.EC,
             EM: message.EM,
@@ -70,7 +69,7 @@ let handelDelTopic = async (req, res) => {
                 EC: 1
             })
         }
-        let message = await serviceTopics.delTopic(id)
+        let message = await topicsService.delTopic(id)
         return res.status(200).json({
             EC: message.EC,
             EM: message.EM
@@ -80,14 +79,12 @@ let handelDelTopic = async (req, res) => {
     }
 }
 
-let handelGetTopicBySlug = async (req, res) => {
+let getTopicBySlug = async (req, res) => {
     try {
 
-        let data = await serviceTopics.getTopicBySlug(req.params.slug);
+        let data = await topicsService.getTopicBySlug(req.params.slug);
         return res.status(200).json({
-            data: data.data,
-            EC: data.EC,
-            EM: data.EM
+            ...data
         })
 
     } catch (error) {
@@ -96,10 +93,11 @@ let handelGetTopicBySlug = async (req, res) => {
 }
 
 module.exports = {
-    handelGetAllTopic: handelGetAllTopic,
-    handelCreateTopic: handelCreateTopic,
-    handelDelTopic: handelDelTopic,
-    handelGetTopicByID: handelGetTopicByID,
-    handelEditTopic: handelEditTopic,
-    handelGetTopicBySlug: handelGetTopicBySlug
+    getAllTopics,
+    getTopicBySlug,
+
+    handelCreateTopic,
+    handelDelTopic,
+    handelGetTopicByID,
+    handelEditTopic,
 }

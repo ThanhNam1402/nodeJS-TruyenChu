@@ -1,7 +1,5 @@
 
 import db from '../models/index';
-// $2a$10$SAgLhuAvrRl68uGsnBgQROh7KRICSBd2DW7G606RFRzvW.GFb429O
-// eve.holt@reqres.in
 
 
 let getAllTopics = async (reqData) => {
@@ -27,8 +25,8 @@ let getAllTopics = async (reqData) => {
 
         res.pagination = pagination
         res.data = rows;
-        res.EC = 0;
-        res.EM = 'success';
+        res.success = true;
+        res.message = 'success';
 
         return res
 
@@ -39,7 +37,7 @@ let getAllTopics = async (reqData) => {
 
 }
 
-let createTopic = (data) => {
+let addTopic = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
 
@@ -189,10 +187,10 @@ let delTopic = (id) => {
 
 
 module.exports = {
-    getAllTopics: getAllTopics,
-    createTopic: createTopic,
-    delTopic: delTopic,
-    getTopicByID: getTopicByID,
-    editTopic: editTopic,
-    getTopicBySlug: getTopicBySlug
+    getAllTopics,
+    addTopic,
+    delTopic,
+    getTopicByID,
+    editTopic,
+    getTopicBySlug
 }
