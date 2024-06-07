@@ -1,16 +1,19 @@
 
-import topicsService from '../services/topicsService'
+import topicsService from '../../services/topicService'
 
 let getAllTopics = async (req, res) => {
 
     try {
+
+        console.log(req.query);
+
         let data = await topicsService.getAllTopics(req.query);
 
         return res.status(200).json({
             ...data
         })
     } catch (error) {
-
+        
     }
 
 }
@@ -28,14 +31,12 @@ let handelCreateTopic = async (req, res) => {
     }
 }
 
-let handelGetTopicByID = async (req, res) => {
+let getOneTopic = async (req, res) => {
     try {
 
-        let data = await topicsService.getTopicByID(req.params.id);
+        let data = await topicsService.getOneTopic(req.params.id);
         return res.status(200).json({
-            data: data.data,
-            EC: data.EC,
-            EM: data.EM
+            ...data
         })
 
     } catch (error) {
@@ -98,6 +99,6 @@ module.exports = {
 
     handelCreateTopic,
     handelDelTopic,
-    handelGetTopicByID,
+    getOneTopic,
     handelEditTopic,
 }

@@ -62,7 +62,7 @@ let addTopic = (data) => {
 
 }
 
-let getTopicByID = async (id) => {
+let getOneTopic = async (id) => {
     try {
 
         let res = {}
@@ -76,12 +76,12 @@ let getTopicByID = async (id) => {
 
         if (topic) {
             res.data = topic;
-            res.EC = 0;
-            res.EM = 'success';
+            res.success = true;
+            res.message = 'success';
 
         } else {
-            res.EC = 1;
-            res.EM = 'Error : Not Found Topic';
+            res.success = false;
+            res.message = 'Error : Not Found Topic';
         }
         return res
 
@@ -105,11 +105,11 @@ let getTopicBySlug = async (slug) => {
 
         if (topic) {
             res.data = topic;
-            res.EC = 0;
+            res.success = true;
             res.EM = 'success';
 
         } else {
-            res.EC = 1;
+            res.success = false;
             res.EM = 'Error : Not Found Topic';
         }
         return res
@@ -190,7 +190,7 @@ module.exports = {
     getAllTopics,
     addTopic,
     delTopic,
-    getTopicByID,
+    getOneTopic,
     editTopic,
     getTopicBySlug
 }

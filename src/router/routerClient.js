@@ -1,19 +1,15 @@
 import express from "express";
 
-import userController from "../controllers/userController";
+import authController from "../controllers/authController";
 
 import { checkTokenJWT } from "../middelware/jwt";
 
 let router = express.Router();
 
 // users 
-router.post('/api/login', userController.handelLogin);
-router.post('/api/logout', userController.handelLogout);
-router.post('/api/refreshToken', userController.handelRefreshToken);
-router.post('/api/account', userController.handelgetAccount);
-
-
-
-
+router.post('/login', authController.handleLogin);
+router.post('/logout', authController.handleLogout);
+router.post('/refresh', authController.handleRefreshToken);
+router.post('/me', checkTokenJWT, authController.handleGetAccount);
 
 export const routerClient = router

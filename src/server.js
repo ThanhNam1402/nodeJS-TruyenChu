@@ -7,8 +7,7 @@ import cookieParser from "cookie-parser"
 import 'dotenv/config'
 import { corsOptions } from "./config/cors";
 
-import { routerAdmin } from "./router/routerAdmin";
-import { routerCreator } from "./router/routerCreator";
+import { routerCreator } from "./router/routerCreator/index";
 import { routerClient } from "./router/routerClient";
 
 
@@ -23,9 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 viewEngine(app);
 
-
-app.use('/admin', routerAdmin)
-app.use('/', routerClient, routerCreator);
+app.use('/api', routerClient, routerCreator);
 
 connectDB();
 

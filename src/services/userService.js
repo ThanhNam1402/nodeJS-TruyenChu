@@ -7,8 +7,7 @@ const salt = bcrypt.genSaltSync(10);
 import { createTokenJWT, verifyTokenJWT, createRefreshTokenJWT } from "../middelware/jwt";
 
 
-
-let handelLogin = async (email, password) => {
+let handleLogin = async (email, password) => {
     try {
         let userData = {};
         let isExist = await checkUserEmail(email);
@@ -83,7 +82,7 @@ let handelCheckRefreshToken = async (refreshToken) => {
         console.log(error);
     }
 }
- 
+
 
 const getAccount = async (token) => {
     try {
@@ -170,33 +169,6 @@ let hashPass = (pass) => {
             let hash = bcrypt.hashSync(pass, salt);
             resolve(hash);
         } catch (error) {
-            reject(error);
-        }
-    })
-}
-
-let getAllCode = (type) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let res = {}
-
-            if (!type) {
-                res.errorCode = 1;
-                res.message = 'not found parameter';
-            } else {
-                let Allcode = await db.Allcode.findAll({
-                    where: { type: type },
-                    raw: true
-                });
-                res.data = Allcode;
-                res.errorCode = 0;
-                res.message = 'success';
-            }
-
-            resolve(res);
-
-        } catch (error) {
-
             reject(error);
         }
     })
@@ -345,10 +317,9 @@ module.exports = {
     createUser: createUser,
     delUser: delUser,
     editUser: editUser,
-    getAllCode: getAllCode,
     getUserByID: getUserByID,
     handelCheckRefreshToken: handelCheckRefreshToken,
-    handelLogin: handelLogin,
+    handleLogin: handleLogin,
     getAccount: getAccount
 
 

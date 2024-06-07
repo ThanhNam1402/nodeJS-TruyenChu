@@ -1,5 +1,5 @@
 
-import chaptersService from '../services/chaptersService';
+import chaptersService from '../../services/creator/chaptersService';
 
 let getAllDrafts = async (req, res) => {
     try {

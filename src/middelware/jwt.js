@@ -6,7 +6,7 @@ const createTokenJWT = (payload) => {
 
     let key = process.env.JWT_TOKEN_SECRET
 
-    const jwtToken = jwt.sign(payload, key, { expiresIn: '1h' });
+    const jwtToken = jwt.sign(payload, key, { expiresIn: '3600' });
 
     console.log("jwtToken : ", jwtToken)
 
@@ -16,7 +16,7 @@ const createRefreshTokenJWT = (payload) => {
 
     let key = process.env.JWT_TOKEN_SECRET
 
-    const jwtToken = jwt.sign(payload, key, { expiresIn: '365d' });
+    const jwtToken = jwt.sign(payload, key, { expiresIn: '24h' });
 
     console.log("jwtToken refresh: ", jwtToken)
 
@@ -41,26 +41,33 @@ const verifyTokenJWT = (token) => {
 
 const checkTokenJWT = (req, res, next) => {
 
-    let userCookie = req.cookies
+    console.log("res header", req.headers.authorization);
 
-    if (userCookie && userCookie.accessToken) {
-        let token = userCookie.accessToken
+    let token = req.headers.authorization?.slice(7)
 
+    console.log("token", token);
+
+
+    if (token) {
         let decoded = verifyTokenJWT(token)
 
         if (!decoded) {
+
+            console.log('loi nha check token');
+
             return res.status(401).json({
-                EC: 1,
-                EM: 'invalid token'
+                success: false,
+                message: 'Token is expired'
             })
         }
         next()
     } else {
         return res.status(401).json({
-            EC: 1,
-            EM: 'new Bạn Cần Đăng Nhập Để Thực Hiện Yêu Cầu Này !!'
+            success: false,
+            message: 'Bạn Cần Đăng Nhập Để Thực Hiện Yêu Cầu Này'
         })
     }
+
 }
 
 

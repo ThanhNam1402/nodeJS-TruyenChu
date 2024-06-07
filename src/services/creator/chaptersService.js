@@ -1,6 +1,6 @@
 
 
-import db from '../models/index';
+import db from '../../models/index';
 import Sequelize from 'sequelize';
 
 let getAllDrafts = (creatorID) => {

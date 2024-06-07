@@ -4,7 +4,7 @@ var cors = require('cors')
 
 // nhung domain duoc phep truy cap tai nguyen server 
 // client and creater 
-const WHITELIST_DOMAINS = ['http://localhost:3000', 'http://localhost:3004']
+const WHITELIST_DOMAINS = ['http://localhost:3000', 'http://localhost:3004', 'http://localhost:5173']
 
 
 

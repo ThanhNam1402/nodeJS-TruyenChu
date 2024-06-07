@@ -1,6 +1,6 @@
 
 
-import db from '../models/index';
+import db from '../../models/index';
 import Sequelize from 'sequelize';
 
 
@@ -125,7 +125,6 @@ let delBook = async (id) => {
 
     } catch (error) { throw error }
 }
-
 
 // Categories
 let getTagType = () => {

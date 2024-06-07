@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
       Users.hasMany(models.Book, {
         foreignKey: 'userID'
       });
+
+      Users.hasMany(models.CMTopic, {
+        foreignKey: 'userID'
+      });
     }
 
   };
